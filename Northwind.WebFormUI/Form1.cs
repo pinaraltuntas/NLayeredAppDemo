@@ -1,6 +1,7 @@
 ﻿using Northwind.Business;
 using Northwind.Business.Abstract;
 using Northwind.Business.Concrete;
+using Northwind.Business.DependencyResolvers.Ninject;
 using Northwind.DataAccess.Concrete.EntityFramework;
 using Northwind.DataAccess.Concrete.NHibernate;
 using Northwind.Entities.Concrete;
@@ -22,8 +23,8 @@ namespace Northwind.WebFormUI
 		public Form1()
 		{
 			InitializeComponent();
-			_productService = new ProductManager(new EfProductDal());
-			_categoryService = new CategoryManager(new EfCategoryDal());
+			_productService = InstanceFactory.GetInstance<IProductService>();
+			_categoryService = InstanceFactory.GetInstance<ICategoryService>();
 		}
 		private IProductService _productService;
 		private ICategoryService _categoryService;
@@ -82,32 +83,50 @@ namespace Northwind.WebFormUI
 
 		private void btnAdd_Click(object sender, EventArgs e)
 		{
-			_productService.Add(new Product()
+			try
 			{
-				CategoryId = Convert.ToInt32(cbxCategoryId.SelectedValue),
-				ProductName = tbxProductName2.Text,
-				QuantityPerUnit = tbxQuantityPerUnit.Text,
-				UnitPrice = Convert.ToDecimal(tbxUnitPrice.Text),
-				UnitsInStock = Convert.ToInt16(tbxStock.Text)
-			});
-			MessageBox.Show("Ürün Eklendi !");
-			LoadProducts();
+				_productService.Add(new Product()
+				{
+					CategoryId = Convert.ToInt32(cbxCategoryId.SelectedValue),
+					ProductName = tbxProductName2.Text,
+					QuantityPerUnit = tbxQuantityPerUnit.Text,
+					UnitPrice = Convert.ToDecimal(tbxUnitPrice.Text),
+					UnitsInStock = Convert.ToInt16(tbxStock.Text)
+				});
+				MessageBox.Show("Ürün Eklendi !");
+				LoadProducts();
+			}
+			catch (Exception exception)
+			{
+
+				MessageBox.Show(exception.Message);
+			}
+			
 		}
 
 		private void btnUpdate_Click(object sender, EventArgs e)
 		{
-			_productService.Update(new Product
+			try
 			{
-				ProductId = Convert.ToInt32(dgwProduct.CurrentRow.Cells[0].Value),
-				ProductName = tbxProductNameUpdate.Text,
-				CategoryId = Convert.ToInt32(cbxCategoryIdUpdate.SelectedValue),
-				QuantityPerUnit = tbxQuantityPerUnitUpdate.Text,
-				UnitPrice = Convert.ToDecimal(tbxUnitPriceUpdate.Text),
-				UnitsInStock = Convert.ToInt16(tbxUnitsInStockUpdate.Text)
+				_productService.Update(new Product
+				{
+					ProductId = Convert.ToInt32(dgwProduct.CurrentRow.Cells[0].Value),
+					ProductName = tbxProductNameUpdate.Text,
+					CategoryId = Convert.ToInt32(cbxCategoryIdUpdate.SelectedValue),
+					QuantityPerUnit = tbxQuantityPerUnitUpdate.Text,
+					UnitPrice = Convert.ToDecimal(tbxUnitPriceUpdate.Text),
+					UnitsInStock = Convert.ToInt16(tbxUnitsInStockUpdate.Text)
 
-			});
-			MessageBox.Show("Ürün Güncellendi !");
-			LoadProducts();
+				});
+				MessageBox.Show("Ürün Güncellendi !");
+				LoadProducts();
+			}
+			catch (Exception exception)
+			{
+
+				MessageBox.Show(exception.Message);
+			}
+			
 		}
 
 		private void dgwProduct_CellClick(object sender, DataGridViewCellEventArgs e)
